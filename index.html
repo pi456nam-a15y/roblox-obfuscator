@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roblox Lua Obfuscator</title>
+    <style>
+        body { font-family: sans-serif; background: #121212; color: #fff; padding: 15px; margin: 0; }
+        .container { max-width: 600px; margin: auto; }
+        textarea { width: 100%; height: 180px; background: #1e1e1e; color: #00ff66; border: 1px solid #333; border-radius: 8px; padding: 10px; font-family: monospace; box-sizing: border-box; font-size: 13px; }
+        button { background: #007acc; color: white; border: none; padding: 12px; font-size: 16px; border-radius: 8px; cursor: pointer; margin: 10px 0; width: 100%; font-weight: bold; }
+        button:disabled { background: #444; }
+        h2 { font-size: 16px; color: #aaa; margin-top: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Roblox Lua Obfuscator</h1>
+        <label>วางโค้ด Lua (รองรับระดับหมื่นบรรทัด):</label>
+        <textarea id="inputCode" placeholder="วางโค้ด Roblox ที่นี่..."></textarea>
+        
+        <button id="btn" onclick="obfuscate()">Obfuscate Code</button>
+
+        <h2>ผลลัพธ์:</h2>
+        <textarea id="outputCode" readonly placeholder="โค้ดที่เข้ารหัสแล้วจะแสดงที่นี่..."></textarea>
+    </div>
+
+    <script>
+        const API_URL = "https://YOUR-BACKEND-URL.onrender.com/obfuscate";
+
+        async function obfuscate() {
+            const input = document.getElementById('inputCode').value;
+            const output = document.getElementById('outputCode');
+            const btn = document.getElementById('btn');
+
+            if (!input.trim()) return alert("กรุณาใส่โค้ดก่อนครับ");
+
+            btn.disabled = true;
+            btn.innerText = "กำลังแปลงโค้ด...";
+            output.value = "กำลังประมวลผล...";
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: input })
+                });
+
+                const data = await response.json();
+                if (data.result) {
+                    output.value = data.result;
+                } else {
+                    output.value = "เกิดข้อผิดพลาด: " + data.error;
+                }
+            } catch (err) {
+                output.value = "เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์";
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Obfuscate Code";
+            }
+        }
+    </script>
+</body>
+</html>
